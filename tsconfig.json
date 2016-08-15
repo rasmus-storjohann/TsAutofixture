@@ -2,11 +2,11 @@
 	"compilerOptions": {
 		"declaration": true,
 		"module": "CommonJS",
-		"target": "es5",
-		"noImplicitAny": true,
+		"target": "es6",
+		"noImplicitAny": false,
 		"outDir": "dist"
 	},
 	"files": [
-		"src/example.ts"
+		"src/index.ts", "test/test.ts"
 	]
 }

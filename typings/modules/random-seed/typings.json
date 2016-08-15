@@ -1,0 +1,9 @@
+{
+  "resolution": "main",
+  "tree": {
+    "main": "index.d.ts",
+    "global": false,
+    "name": "random-seed",
+    "type": "typings"
+  }
+}
