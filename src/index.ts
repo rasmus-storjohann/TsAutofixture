@@ -240,6 +240,19 @@ export class Autofixture {
     }
 
     private parseNumberSpec(spec: string): () => number {
+
+        var parsedSpec = this.parseSimpleNumericalSpec(spec) || 
+                         this.parseAsOnesidedSpec(spec) ||
+                         this.parseAsTwosidedSpec(spec);
+
+        if (parsedSpec) {
+            return parsedSpec;
+        }
+
+        throw Error("Invalid number autofixture spec: '" + spec + "'");
+    }
+
+    private parseSimpleNumericalSpec(spec: string) : () => number {
         if (spec === "number") {
             return () => {
                 return Autofixture.createNumber();
@@ -250,14 +263,7 @@ export class Autofixture {
                 return Autofixture.createInteger();
             };
         }
-
-        var parsedSpec = this.parseAsOnesidedSpec(spec) || this.parseAsTwosidedSpec(spec);
-
-        if (parsedSpec) {
-            return parsedSpec;
-        }
-
-        throw Error("Invalid number autofixture spec: '" + spec + "'");
+        return undefined;
     }
 
     private parseAsOnesidedSpec(spec: string) : () => number {
