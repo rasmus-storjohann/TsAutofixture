@@ -4,15 +4,7 @@
 // create arrays of basic types, e.g. integers and strings etc.
 // https://lostechies.com/johnteague/2014/05/21/autofixturejs/
 // support exponential values in number spec
-// support <= for numbers
 // support "skip" option
-// support .withArraySize
-
-interface ParsedSpec {
-    isInteger: boolean;
-    lowerBound?: number;
-    upperBound?: number;
-};
 
 export interface Options {
     [key: string] : string | Options;
@@ -244,14 +236,18 @@ export class Autofixture {
     }
 
     private createNumberFromSpec(spec: string) : number {
-        var parsedSpec = this.parseNumberSpec(spec);
-        return this.createNumberFromParsedSpec(parsedSpec);
+        return this.parseNumberSpec(spec)();
     }
 
-    private parseNumberSpec(spec: string) : ParsedSpec {
-        if (spec === "number" || spec === "integer") {
-            return {
-                isInteger: spec === "integer"
+    private parseNumberSpec(spec: string): () => number {
+        if (spec === "number") {
+            return () => {
+                return Autofixture.createNumber();
+            };
+        }
+        if (spec === "integer") {
+            return () => {
+                return Autofixture.createInteger();
             };
         }
 
@@ -264,7 +260,7 @@ export class Autofixture {
         throw Error("Invalid number autofixture spec: '" + spec + "'");
     }
 
-    private parseAsOnesidedSpec(spec: string) : ParsedSpec {
+    private parseAsOnesidedSpec(spec: string) : () => number {
         // number or integer, followed by < or >, followed by a real value
         var match = /^\s*(number|integer)\s*(\>|\<)\s*(\d*\.?\d+)\s*$/.exec(spec);
         if (!match) {
@@ -277,19 +273,27 @@ export class Autofixture {
 
         if (isInteger) {
             this.validateIsInteger(match[3]);
+
+            if (isUpperBound) {
+                return () => {
+                    return Autofixture.createIntegerBelow(limit);
+                };
+            }
+
+            return () => {
+                return Autofixture.createIntegerAbove(limit);
+            };
         }
 
         if (isUpperBound) {
-            return {
-                isInteger: isInteger,
-                upperBound: limit
-            };
-        } else {
-            return {
-                isInteger: isInteger,
-                lowerBound: limit
+            return () => {
+                return Autofixture.createNumberBelow(limit);
             };
         }
+
+        return () => {
+            return Autofixture.createNumberAbove(limit);
+        };
     };
 
     private validateIsInteger(spec: string) : void {
@@ -300,56 +304,34 @@ export class Autofixture {
         }
     }
 
-    private parseAsTwosidedSpec(spec: string) : ParsedSpec {
+    private parseAsTwosidedSpec(spec: string) : () => number {
         // a number, followed by <, followed by 'number' or 'integer', followed by < and another number
         var match = /^\s*(\d*\.?\d+)\s*\<\s*(integer|number)\s*\<\s*(\d*\.?\d+)\s*$/.exec(spec);
         if (!match) {
             return undefined;
         }
 
-        var lowerBound = parseFloat(match[1]);
-        var isInteger = match[2] === "integer";
-        var upperBound = parseFloat(match[3]);
+        var lowerBoundAsString = match[1];
+        var upperBoundAsString = match[3];
 
-        if (isInteger) {
-            this.validateIsInteger(match[1]);
-            this.validateIsInteger(match[3]);
-        }
+        var lowerBound = parseFloat(lowerBoundAsString);
+        var upperBound = parseFloat(upperBoundAsString);
 
         if (lowerBound >= upperBound) {
-            throw Error("Lower bound " + match[1] + " must be lower than upper bound " + match[3]);
+            throw Error("Lower bound " + lowerBound + " must be lower than upper bound " + upperBound);
         }
 
-        return { // return a closure here, then the next function is not needed
-            isInteger: isInteger,
-            lowerBound: lowerBound,
-            upperBound: upperBound
+        if (match[2] === "integer") {
+            this.validateIsInteger(lowerBoundAsString);
+            this.validateIsInteger(upperBoundAsString);
+
+            return () => {
+                return Autofixture.createIntegerBetween(lowerBound, upperBound);
+            };
+        }
+
+        return () => {
+            return Autofixture.createNumberBetween(lowerBound, upperBound);
         };
     };
-
-    private createNumberFromParsedSpec(spec: ParsedSpec) : number {
-        if (spec.isInteger) {
-            if (spec.lowerBound && spec.upperBound) {
-                return Autofixture.createIntegerBetween(spec.lowerBound, spec.upperBound);
-            }
-            if (spec.lowerBound) {
-                return Autofixture.createIntegerAbove(spec.lowerBound);
-            }
-            if (spec.upperBound) {
-                return Autofixture.createIntegerBelow(spec.upperBound);
-            }
-            return Autofixture.createInteger();
-        }
-
-        if (spec.lowerBound && spec.upperBound) {
-            return Autofixture.createNumberBetween(spec.lowerBound, spec.upperBound);
-        }
-        if (spec.lowerBound) {
-            return Autofixture.createNumberAbove(spec.lowerBound);
-        }
-        if (spec.upperBound) {
-            return Autofixture.createNumberBelow(spec.upperBound);
-        }
-        return Autofixture.createNumber();
-    }
 };
