@@ -330,7 +330,7 @@ describe("Autofixture", () => {
 
         it("one sided spec with whitespace in spec", () => {
             var subject = new Autofixture({
-                "value" : " integer < 8 "
+                "value" : "  integer  <  8  "
             });
             var value = subject.create(new ClassWithNumber(0));
             chai.expect(value.value).to.be.a("number");
@@ -353,6 +353,14 @@ describe("Autofixture", () => {
             var value = subject.create(new ClassWithNumber(0));
             chai.expect(value.value).to.be.a("number");
         });
+    });
+
+    it("shoud skip a field that is marked skip", () => {
+        var subject = new Autofixture({
+            "value" : "skip"
+        });
+        var value = subject.create(new ClassWithNumber(0));
+        chai.expect(value.value).to.be.undefined;
     });
 
     describe("creating strings", () => {

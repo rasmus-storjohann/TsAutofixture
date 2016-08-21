@@ -4,7 +4,6 @@
 // create arrays of basic types, e.g. integers and strings etc.
 // https://lostechies.com/johnteague/2014/05/21/autofixturejs/
 // support exponential values in number spec
-// support "skip" option
 
 export interface Options {
     [key: string] : string | Options;
@@ -84,34 +83,32 @@ export class Autofixture {
     }
 
     private createObject<T extends Object>(template: T, options?: Options) : T {
-        var optionsForObject: Options;
-        var type: string;
-        var spec: string;
         var result: T;
+        var childOptions: Options;
+        var childType: string;
+        var childSpec: string;
         var elementCount = 3;
+        var childElementTemplate;
         this.throwIfOptionsContainsFieldsNotIn(template, options); // typo, Contain
 
         result = Object.assign({}, template);
 
         this.forEachProperty(result, (name: string) => {
-            type = this.actualTypeOfField(result, name);
-            if (type === "actualObject") { // use TS2.0 to limit the set of values for this field
+            childType = this.actualTypeOfField(result, name);
+            childOptions = options && <Options>options[name];
+            childSpec = (options && <string>options[name]) || typeof result[name][0];
 
-                optionsForObject = options && <Options>options[name];
-                result[name] = this.createObject(result[name], optionsForObject);
-
-            } else if (type === "arrayOfObjects") {
-
-                optionsForObject = options && <Options>options[name];
-                result[name] = this.createManyObjects(result[name][0], elementCount, optionsForObject);
-
-            } else if (type === "arrayOfPrimitives") {
-
-                spec = (options && <string>options[name]) || typeof result[name][0];
-                result[name] = this.createManyPrimitiveFromSpec(elementCount, spec);
-
+            if (childSpec === "skip") {
+                delete result[name];
+            } else if (childType === "actualObject") {
+                result[name] = this.createObject(result[name], childOptions);
+            } else if (childType === "arrayOfObjects") {
+                childElementTemplate = result[name][0];
+                result[name] = this.createManyObjects(childElementTemplate, elementCount, childOptions);
+            } else if (childType === "arrayOfPrimitives") {
+                result[name] = this.createManyPrimitiveFromSpec(elementCount, childSpec);
             } else {
-                result[name] = this.createSimpleProperty(name, type, options);
+                result[name] = this.createSimpleProperty(name, childType, options);
             }
         });
 
@@ -241,7 +238,7 @@ export class Autofixture {
 
     private parseNumberSpec(spec: string): () => number {
 
-        var parsedSpec = this.parseSimpleNumericalSpec(spec) || 
+        var parsedSpec = this.parseSimpleNumericalSpec(spec) ||
                          this.parseAsOnesidedSpec(spec) ||
                          this.parseAsTwosidedSpec(spec);
 
