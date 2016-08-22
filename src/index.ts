@@ -60,30 +60,19 @@ export class Autofixture {
         return Math.floor(Autofixture.createNumberBetween(lowerBound, upperBound));
     }
 
-    private options: Options;
-
-    constructor(options?: Options) {
-        this.options = options;
+    constructor() {
     }
 
-    public create<T extends Object>(template: T) : T {
-        return this.createObject(template, this.options);
-    }
-
-    public createMany<T extends Object>(template: T, count? : number) : T[] {
+    public createMany<T extends Object>(template: T, count?: number, options?: Options) : T[] {
         count = count || 3;
-        return this.createManyObjects(template, count, this.options);
-    }
-
-    private createManyObjects<T extends Object>(template: T, count: number, options?: Options) : T[] {
         var results = [];
         for (var i = 0; i < count; i++) {
-            results.push(this.createObject(template, options));
+            results.push(this.create(template, options));
         }
         return results;
     }
 
-    private createObject<T extends Object>(template: T, options?: Options) : T {
+    public create<T extends Object>(template: T, options?: Options) : T {
         var result: T;
         var childOptions: Options;
         var childType: string;
@@ -102,10 +91,10 @@ export class Autofixture {
             if (childSpec === "skip") {
                 delete result[name];
             } else if (childType === "actualObject") {
-                result[name] = this.createObject(result[name], childOptions);
+                result[name] = this.create(result[name], childOptions);
             } else if (childType === "arrayOfObjects") {
                 childElementTemplate = result[name][0];
-                result[name] = this.createManyObjects(childElementTemplate, elementCount, childOptions);
+                result[name] = this.createMany(childElementTemplate, elementCount, childOptions);
             } else if (childType === "arrayOfPrimitives") {
                 result[name] = this.createManyPrimitiveFromSpec(elementCount, childSpec);
             } else {
