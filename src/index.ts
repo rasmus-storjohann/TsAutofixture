@@ -4,6 +4,7 @@
 // create arrays of basic types, e.g. integers and strings etc.
 // https://lostechies.com/johnteague/2014/05/21/autofixturejs/
 // support exponential values in number spec
+// copy functions and prototype from template
 
 export interface Options {
     [key: string] : string | Options;

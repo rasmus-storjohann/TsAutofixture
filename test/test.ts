@@ -6,6 +6,45 @@ import * as chai from "chai";
 
 describe("Autofixture", () => {
 
+    describe("examples", () => {
+        class MyDto {
+            id: number;
+            firstName: string;
+            lastName: string;
+            constructor() {
+            }
+        }
+        var unitUnderTest = function(value: MyDto) {
+            if (value.id < 0) {
+                throw Error("");
+            }
+        }
+        var aDto: MyDto;
+        beforeEach(()=>{
+            aDto = new MyDto();
+        })
+
+        it("throws on negative id", () => {
+            var dataWithNegativeId = {
+                id: -1,
+                firstName: "John",
+                lastName: "Smith"
+            }
+            chai.expect(() => {
+                unitUnderTest(dataWithNegativeId);
+            }).to.throw(Error);
+        });
+
+        it("throws on negative id with autofixture", () => {
+            var makeNegativeId = new Autofixture({
+                "id" : "number < 0"
+            });
+            chai.expect(() => {
+                unitUnderTest(makeNegativeId.create(aDto));
+            }).to.throw(Error);
+        });
+    });
+
     describe("static functions", () => {
 
         it("should create boolean", () => {
