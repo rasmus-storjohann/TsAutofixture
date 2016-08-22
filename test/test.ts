@@ -51,9 +51,14 @@ describe("Autofixture", () => {
         }
     };
 
+    var simpleTemplate: SimpleClass;
+    beforeEach(() => {
+        simpleTemplate = new SimpleClass();
+    });
+
     it("can create without spec", () => {
         var subject = new Autofixture();
-        var value = subject.create(new SimpleClass()); // TODO use fixtures for this
+        var value = subject.create(simpleTemplate);
         chai.expect(value.flag).to.be.a("boolean");
         chai.expect(value.value).to.be.a("number");
         chai.expect(value.name).to.be.a("string");
@@ -63,7 +68,7 @@ describe("Autofixture", () => {
         var subject = new Autofixture({
             "value" : "number > 5"
         });
-        var value = subject.create(new SimpleClass());
+        var value = subject.create(simpleTemplate);
         chai.expect(value.value).to.be.a("number");
         chai.expect(value.value).to.be.at.least(5);
         chai.expect(value.name).to.be.a("string");
@@ -72,12 +77,11 @@ describe("Autofixture", () => {
 
     it("does not modify argument object", () => {
         var subject = new Autofixture();
-        var argumentObject = new SimpleClass();
-        argumentObject.name = "name";
+        simpleTemplate.name = "name";
 
-        subject.create(argumentObject);
+        subject.create(simpleTemplate);
 
-        chai.expect(argumentObject.name).to.equal("name");
+        chai.expect(simpleTemplate.name).to.equal("name");
     });
 
     describe("can create nested objects", () => {
@@ -91,9 +95,14 @@ describe("Autofixture", () => {
             }
         }
 
+        var templateWithNestedClass: ClassWithNestedClass;
+        beforeEach(() => {
+            templateWithNestedClass = new ClassWithNestedClass();
+        });
+
         it("without spec", () => {
             var subject = new Autofixture();
-            var value = subject.create(new ClassWithNestedClass());
+            var value = subject.create(templateWithNestedClass);
             chai.expect(value.label).to.be.a("string");
             chai.expect(value.nested.flag).to.be.a("boolean");
             chai.expect(value.nested.value).to.be.a("number");
@@ -106,7 +115,7 @@ describe("Autofixture", () => {
                     "name" : "string[5]"
                 }
             });
-            var value = subject.create(new ClassWithNestedClass());
+            var value = subject.create(templateWithNestedClass);
             chai.expect(value.nested.name).to.be.a("string");
             chai.expect(value.nested.name).to.have.lengthOf(5);
         });
@@ -123,17 +132,21 @@ describe("Autofixture", () => {
                 this.nestedArray = [0];
             }
         }
+        var templateWithNestedPrimitiveArray: ClassWithNestedPrimitiveArray;
+        beforeEach(() => {
+            templateWithNestedPrimitiveArray = new ClassWithNestedPrimitiveArray();
+        });
 
         it("creates several values in nested array", () => {
             var subject = new Autofixture();
-            var value = subject.create(new ClassWithNestedPrimitiveArray());
+            var value = subject.create(templateWithNestedPrimitiveArray);
             chai.expect(value.nestedArray).to.be.an("Array");
             chai.expect(value.nestedArray).to.have.length.above(1);
         });
 
         it("create values of the expected type", () => {
             var subject = new Autofixture();
-            var value = subject.create(new ClassWithNestedPrimitiveArray());
+            var value = subject.create(templateWithNestedPrimitiveArray);
             chai.expect(value.nestedArray[0]).to.be.a("number");
         });
 
@@ -141,7 +154,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "nestedArray" : "10 < integer < 20"
             });
-            var value = subject.create(new ClassWithNestedPrimitiveArray());
+            var value = subject.create(templateWithNestedPrimitiveArray);
             chai.expect(value.nestedArray[0] % 1).to.equal(0);
             chai.expect(value.nestedArray[0]).to.be.within(11, 19);
         });
@@ -174,20 +187,24 @@ describe("Autofixture", () => {
             public nestedArray: SimpleClass[];
             constructor() {
                 this.label = "";
-                this.nestedArray = [new SimpleClass()];
+                this.nestedArray = [simpleTemplate];
             }
         }
+        var templateWithNestedArray: ClassWithNestedArray;
+        beforeEach(() => {
+            templateWithNestedArray = new ClassWithNestedArray();
+        });
 
         it("creates several objects in nested array", () => {
             var subject = new Autofixture();
-            var value = subject.create(new ClassWithNestedArray());
+            var value = subject.create(templateWithNestedArray);
             chai.expect(value.nestedArray).to.be.an("Array");
             chai.expect(value.nestedArray).to.have.length.above(1);
         });
 
         it("create objects of the expected type", () => {
             var subject = new Autofixture();
-            var value = subject.create(new ClassWithNestedArray());
+            var value = subject.create(templateWithNestedArray);
             chai.expect(value.nestedArray[0].flag).to.be.a("boolean");
             chai.expect(value.nestedArray[0].value).to.be.a("number");
             chai.expect(value.nestedArray[0].name).to.be.a("string");
@@ -200,7 +217,7 @@ describe("Autofixture", () => {
                     "name" : "string[5]"
                 }
             });
-            var value = subject.create(new ClassWithNestedArray());
+            var value = subject.create(templateWithNestedArray);
             chai.expect(value.nestedArray[0].name).to.have.lengthOf(5);
         });
     });
@@ -210,7 +227,7 @@ describe("Autofixture", () => {
 
         beforeEach(() => {
             var subject = new Autofixture();
-            values = subject.createMany(new SimpleClass());
+            values = subject.createMany(simpleTemplate);
         });
 
         it("returns an array of several elements", () => {
@@ -251,10 +268,15 @@ describe("Autofixture", () => {
 
     class ClassWithNumber {
         public value: number;
-        constructor(value: number) {
-            this.value = value;
+        constructor() {
+            this.value = 0;
         }
     }
+
+    var templateWithNumber: ClassWithNumber;
+    beforeEach(() => {
+        templateWithNumber = new ClassWithNumber();
+    });
 
     describe("creating numbers", () => {
 
@@ -262,7 +284,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "number"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
         });
 
@@ -270,7 +292,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "number > 3.2"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value).to.be.at.least(3.2);
         });
@@ -279,7 +301,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "number < 3.2"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value).to.be.at.most(3.2);
         });
@@ -288,7 +310,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "1.222 < number < 1.223"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value).to.be.within(1.222, 1.223);
         });
@@ -303,7 +325,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "integer"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value % 1).to.equal(0);
         });
@@ -312,7 +334,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "integer > 3"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value % 1).to.equal(0);
             chai.expect(value.value).to.be.at.least(4);
@@ -322,7 +344,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "integer < 8"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value % 1).to.equal(0);
             chai.expect(value.value).to.be.at.most(7);
@@ -332,7 +354,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "  integer  <  8  "
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
         });
 
@@ -340,7 +362,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "4 < integer < 8"
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
             chai.expect(value.value % 1).to.equal(0);
             chai.expect(value.value).to.be.within(5, 7);
@@ -350,7 +372,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "value" : "  4  <  integer  <  8  "
             });
-            var value = subject.create(new ClassWithNumber(0));
+            var value = subject.create(templateWithNumber);
             chai.expect(value.value).to.be.a("number");
         });
     });
@@ -359,7 +381,7 @@ describe("Autofixture", () => {
         var subject = new Autofixture({
             "value" : "skip"
         });
-        var value = subject.create(new ClassWithNumber(0));
+        var value = subject.create(templateWithNumber);
         chai.expect(value.value).to.be.undefined;
     });
 
@@ -367,16 +389,20 @@ describe("Autofixture", () => {
 
         class ClassWithString {
             public name: string;
-            constructor(name: string) {
-                this.name = name;
+            constructor() {
+                this.name = "";
             }
         };
+        var templateWithString: ClassWithString;
+        beforeEach(() => {
+            templateWithString = new ClassWithString();
+        });
 
         it("with default length", () => {
             var subject = new Autofixture({
                 "name" : "string"
             });
-            var value = subject.create(new ClassWithString(""));
+            var value = subject.create(templateWithString);
             chai.expect(value.name).to.be.a("string");
             chai.expect(value.name).to.not.be.empty;
         });
@@ -385,7 +411,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "name" : "string[5]"
             });
-            var value = subject.create(new ClassWithString(""));
+            var value = subject.create(templateWithString);
             chai.expect(value.name).to.be.a("string");
             chai.expect(value.name).to.have.lengthOf(5);
         });
@@ -394,7 +420,7 @@ describe("Autofixture", () => {
             var subject = new Autofixture({
                 "name" : " string [ 5 ] "
             });
-            var value = subject.create(new ClassWithString(""));
+            var value = subject.create(templateWithString);
         });
     });
 
@@ -404,16 +430,16 @@ describe("Autofixture", () => {
                 "naem" : "string"
             });
             chai.expect(() => {
-                subject.create(new SimpleClass());
+                subject.create(simpleTemplate);
             }).to.throw(Error, /field \'naem\' that is not in the type/);
         });
 
         it("on wrong type in spec", () => {
             var subject = new Autofixture({
-                "name" : "number" // also "number < 5" etc?
+                "name" : "number"
             });
             chai.expect(() => {
-                subject.create(new SimpleClass());
+                subject.create(simpleTemplate);
             }).to.throw(Error, /\'number\' not compatible with type \'string\'/);
         });
 
@@ -422,7 +448,7 @@ describe("Autofixture", () => {
                 "name" : invalidSpec
             });
             var expectedToThrow = () => {
-                subject.create(new SimpleClass());
+                subject.create(simpleTemplate);
             };
             chai.expect(expectedToThrow).to.throw(Error, expected);
         };
@@ -432,7 +458,7 @@ describe("Autofixture", () => {
                 "value" : invalidSpec
             });
             var expectedToThrow = () => {
-                subject.create(new ClassWithNumber(0));
+                subject.create(templateWithNumber);
             };
             chai.expect(expectedToThrow).to.throw(Error, expected);
         };
