@@ -89,6 +89,12 @@ it("returns an array of several elements", () => {
   chai.expect(values).to.have.length.above(1);
 });
 
+it("returns an array of the requested number of elements", () => {
+  var values = fixture.createMany(simpleTemplate, 5);
+  chai.expect(values).to.be.instanceOf(Array);
+  chai.expect(values).to.have.lengthOf(5);
+});
+
 it("returns an array of the expected type", () => {
     var values = fixture.createMany(simpleTemplate);
     chai.expect(values[0]).to.be.instanceOf(Object);
