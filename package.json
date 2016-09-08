@@ -12,6 +12,7 @@
     "test": "mocha dist/test"
   },
   "author": "Rasmus Storjohann",
+  "email": "rasmus@storbot.ca",
   "license": "MIT",
   "typescript": {
     "definition": "dist/src/index.d.ts"
