@@ -7,7 +7,6 @@
   "scripts": {
     "clean": "rm -fr dist/",
     "build": "tsc -p tsconfig.json",
-    "postinstall": "tsc -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch"
   },
