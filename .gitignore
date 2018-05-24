@@ -1,5 +1,3 @@
 node_modules/
-dist/
-*.d.ts
 *.log
 *.tgz

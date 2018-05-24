@@ -1,12 +1,10 @@
 {
-	"compilerOptions": {
-		"declaration": true,
-		"module": "CommonJS",
-		"target": "es6",
-		"noImplicitAny": false,
-		"outDir": "dist"
-	},
-	"files": [
-		"src/index.ts", "test/test.ts"
-	]
+  "compilerOptions": {
+    "declaration": true,
+    "module": "CommonJS",
+    "target": "es6",
+    "noImplicitAny": false,
+    "outDir": "./dist"
+  },
+  "files": ["./src/index.ts"]
 }

@@ -1,29 +1,32 @@
 {
   "name": "ts-autofixture",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Autofixture package for TypeScript",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "clean": "rm -fr dist/ index.d.ts index.ref.d.ts typings/auto.d.ts",
-    "preinstall": "npm install autodts",
-    "postinstall": "autodts link",
-    "build": "tsc",
-    "postbuild": "autodts generate",
-    "test": "mocha dist/test"
+    "clean": "rm -fr dist/",
+    "build": "tsc -p tsconfig.json",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "author": "Rasmus Storjohann",
   "email": "rasmus@storbot.ca",
   "license": "MIT",
-  "typescript": {
-    "definition": "dist/src/index.d.ts"
-  },
   "dependencies": {
     "randomatic": "^1.1.5"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.0.2",
-    "typescript": "~1.8.10",
-    "autodts": "~0.0.4"
+    "@types/jest": "^22.2.3",
+    "jest": "^22.4.4",
+    "ts-jest": "^22.4.6",
+    "typescript": "^2.8.3"
+  },
+  "jest": {
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(js?|ts?)$",
+    "moduleFileExtensions": ["ts", "js"],
+    "transform": {
+      "\\.(ts)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    }
   }
 }
