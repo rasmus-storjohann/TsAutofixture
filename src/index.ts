@@ -42,19 +42,19 @@ export class Autofixture {
   }
 
   public static createInteger(): number {
-    return Math.floor(Autofixture.createNumber());
+    return this.createIntegerBetween(0, 1000);
   }
 
   public static createIntegerBelow(upperBound: number): number {
-    return Math.floor(Autofixture.createNumberBelow(upperBound));
+    return this.createIntegerBetween(upperBound - 1000, upperBound);
   }
 
   public static createIntegerAbove(lowerBound: number): number {
-    return Math.floor(Autofixture.createNumberAbove(lowerBound));
+    return this.createIntegerBetween(lowerBound, lowerBound + 1000);
   }
 
   public static createIntegerBetween(lowerBound: number, upperBound: number): number {
-    return Math.floor(Autofixture.createNumberBetween(lowerBound, upperBound));
+    return lowerBound + 1 + Math.floor(Math.random() * (upperBound - lowerBound - 1));
   }
 
   constructor() {}
