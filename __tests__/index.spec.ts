@@ -398,7 +398,7 @@ describe('Autofixture', () => {
     });
   });
 
-  it('shoud skip a field that is marked skip', () => {
+  it('should skip a field that is marked skip', () => {
     var value = autofixture.create(templateWithNumber, {
       value: 'skip'
     });

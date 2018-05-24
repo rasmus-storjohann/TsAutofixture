@@ -20,14 +20,6 @@ it("throws on negative id not using autofixture", () => {
 ```
 Autofixtures allow you to clean that up so that instead you have a test that only contains the things that you actually care about. The autofixture generates random data to populate the DTO, leaving you to only explicitly specify the aspects of the test data that are relevant to the test:
 ```
-var fixture: Autofixture;
-var template: MyDto;
-
-beforeEach(()=>{
-    fixture = new Autofixture();
-    template = new MyDto();
-});
-
 it("throws on negative id with autofixture", () => {
     var dtoWithNegativeId = fixture.create(template, {
         id : "integer < 0"
@@ -47,7 +39,7 @@ it("accepts zero id", () => {
 });
 ```
 ## Objects
-Given an object as a template, Autofixture will give you another object with the same fields of the same basic types, but populated with random values subject to constraints (see below). Members objects are recursively generated in the same way, as are arrays of objects or primitive values. The template object is not changed, typically you would reuse the template object in many tests. For example:
+Given an object as a template, Autofixture will give you another object with the same fields of the same basic types, but populated with random values subject to constraints (see below). Members objects are recursively generated in the same way, as are arrays of objects or primitive values. (Arrays of arrays are not supported.) The template object is not changed, typically you would reuse the template object in many tests. For example:
 ```
 class SimpleClass {
     public flag: boolean;
@@ -76,13 +68,8 @@ it("can create object", () => {
 
 ```
 ## Arrays of objects
-You can create arrays of objects by just calling `createMany` instead of `create`, and optionally pass in the nubmer of elements.
+You can create arrays of objects by just calling `createMany` instead of `create`, and optionally pass in the number of elements.
 ```
-var fixture: Autofixture;
-beforeEach(() => {
-    fixture = new Autofixture();
-});
-
 it("returns an array of several elements", () => {
   var values = fixture.createMany(simpleTemplate);
   chai.expect(values).to.be.instanceOf(Array);
@@ -132,7 +119,7 @@ it("with any value", () => {
 });
 
 ```
-This behaviour can be modifies by passing in options specifying how the field is to be populated, using e.g.
+This behaviour can be modified by passing in options specifying how the field is to be populated, using e.g.
 
 * `"number"` (generates a random real value, this is the default)
 * `"number < 3.2"`
