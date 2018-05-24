@@ -195,8 +195,8 @@ describe('Autofixture', () => {
         nestedArray: '10 < integer < 20'
       });
       expect(value.nestedArray[0] % 1).toEqual(0);
-      expect(value.nestedArray[0]).toBeGreaterThan(11);
-      expect(value.nestedArray[0]).toBeLessThan(19);
+      expect(value.nestedArray[0]).toBeGreaterThan(10);
+      expect(value.nestedArray[0]).toBeLessThan(20);
     });
 
     it('throws on empty array', () => {
@@ -324,7 +324,7 @@ describe('Autofixture', () => {
         value: 'number > 3.2'
       });
       expect(value.value).toEqual(expect.any(Number));
-      expect(value.value).toBeGreaterThanOrEqual(3.2);
+      expect(value.value).toBeGreaterThan(3.2);
     });
 
     it('with a value below a limit', () => {
@@ -332,7 +332,7 @@ describe('Autofixture', () => {
         value: 'number < 3.2'
       });
       expect(value.value).toEqual(expect.any(Number));
-      expect(value.value).toBeLessThanOrEqual(3.2);
+      expect(value.value).toBeLessThan(3.2);
     });
 
     it('with a value in a range', () => {
@@ -362,7 +362,7 @@ describe('Autofixture', () => {
       });
       expect(value.value).toEqual(expect.any(Number));
       expect(value.value % 1).toEqual(0);
-      expect(value.value).toBeGreaterThanOrEqual(4);
+      expect(value.value).toBeGreaterThan(3);
     });
 
     it('with a value below a limit', () => {
@@ -371,7 +371,7 @@ describe('Autofixture', () => {
       });
       expect(value.value).toEqual(expect.any(Number));
       expect(value.value % 1).toEqual(expect.any(Number));
-      expect(value.value).toBeLessThanOrEqual(7);
+      expect(value.value).toBeLessThan(8);
     });
 
     it('one sided spec with whitespace in spec', () => {
@@ -398,7 +398,7 @@ describe('Autofixture', () => {
     });
   });
 
-  it('shoud skip a field that is marked skip', () => {
+  it('should skip a field that is marked skip', () => {
     var value = autofixture.create(templateWithNumber, {
       value: 'skip'
     });
